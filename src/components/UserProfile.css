@@ -1,0 +1,54 @@
+.user-profile {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-info label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-info input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: white;
+}
+
+.profile-info input:disabled {
+  background-color: #e9e9e9;
+  color: #555;
+}
+
+.profile-actions {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.profile-actions .btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.profile-actions .btn:hover {
+  background-color: #0056b3;
+}

@@ -24,3 +24,12 @@ const database = getDatabase(app);
 
 export { auth, database, analytics };
 export default app;
+
+/*
+{
+  "rules": {
+    ".read": "now < 1755109800000",  // 2025-8-14
+    ".write": "now < 1755109800000",  // 2025-8-14
+  }
+}
+  */

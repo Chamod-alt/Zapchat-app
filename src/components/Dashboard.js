@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
@@ -41,6 +42,7 @@ export default function Dashboard() {
           <div className="feature-card">
             <h3>💬 Real-time Chat</h3>
             <p>Chat features will be implemented here</p>
+            <Link to="/Singlechat" >goto link</Link>
           </div>
           
           <div className="feature-card">

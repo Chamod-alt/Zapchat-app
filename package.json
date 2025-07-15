@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "firebase": "^11.10.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.3"
   },
   "scripts": {
