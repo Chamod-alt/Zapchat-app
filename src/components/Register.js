@@ -145,7 +145,6 @@ export default function Register() {
               required
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
-            }
           </div>
 
           <div className="form-group">
@@ -164,7 +163,6 @@ export default function Register() {
               {getUsernameStatus()}
             </div>
             {errors.username && <span className="error-message">{errors.username}</span>}
-            }
           </div>
 
           <div className="form-group">
@@ -180,7 +178,6 @@ export default function Register() {
               required
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
-            }
           </div>
 
           <div className="form-group">
@@ -196,7 +193,6 @@ export default function Register() {
               required
             />
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
-            }
           </div>
 
           <div className="form-group">
@@ -213,11 +209,9 @@ export default function Register() {
               required
             />
             {errors.pin && <span className="error-message">{errors.pin}</span>}
-            }
           </div>
 
           {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
-          }
 
           <button 
             type="submit" 
