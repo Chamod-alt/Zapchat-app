@@ -1,8 +1,7 @@
 
 
-//  Firebase Chat App: Add Friends by Email with Search
-
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaPaperPlane,
   FaTrash,
@@ -11,6 +10,10 @@ import {
   FaMoon,
   FaSun,
   FaUserPlus,
+  FaBars,
+  FaTimesCircle,
+  FaUserCircle,
+   FaCalendar
 } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -24,23 +27,28 @@ import {
 } from "firebase/database";
 import { database } from "../firebase/config";
 import "./Singlechat.css";
-//
-import { Link } from "react-router-dom";
+import UserProfile from "../components/UserProfile";
 
 export default function Chat() {
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [darkMode, setDarkMode] = useState(false);
   const [friends, setFriends] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [image, setImage] = useState(null);
   const [searchEmail, setSearchEmail] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   useEffect(() => {
+    if (!currentUser) return;
+
     const userFriendsRef = ref(database, `users/${currentUser.uid}/friends`);
     onValue(userFriendsRef, (snapshot) => {
       const data = snapshot.val() || {};
@@ -54,10 +62,11 @@ export default function Chat() {
         setSelectedUserId(loaded[0].id);
       }
     });
-  }, [currentUser.uid]);
+  }, [currentUser]);
 
   useEffect(() => {
-    if (!selectedUserId) return;
+    if (!selectedUserId || !currentUser) return;
+
     const convoId = getConversationId(currentUser.uid, selectedUserId);
     const messagesRef = ref(database, `conversations/${convoId}/messages`);
     onValue(messagesRef, (snapshot) => {
@@ -68,23 +77,41 @@ export default function Chat() {
       }
       setMessages(loaded);
     });
-  }, [selectedUserId, currentUser.uid]);
+  }, [selectedUserId, currentUser]);
 
   const getConversationId = (uid1, uid2) => {
     return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
   };
 
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const sendMessage = async () => {
     if (!newMsg && !image) return;
+
     const convoId = getConversationId(currentUser.uid, selectedUserId);
-    const msgRef = push(ref(database, `conversations/${convoId}/messages`));
+    const newMessageRef = push(ref(database, `conversations/${convoId}/messages`));
+
+    let base64Image = null;
+    if (image) {
+      base64Image = await convertToBase64(image);
+    }
+
     const message = {
       text: newMsg,
       senderId: currentUser.uid,
       timestamp: Date.now(),
-      imageUrl: image ? URL.createObjectURL(image) : null,
+      imageUrl: base64Image,
     };
-    await set(msgRef, message);
+
+    await set(newMessageRef, message);
+
     setNewMsg("");
     setImage(null);
   };
@@ -94,27 +121,31 @@ export default function Chat() {
     await remove(ref(database, `conversations/${convoId}/messages/${msgId}`));
   };
 
-  const toggleDarkMode = () => setDarkMode((prev) => !prev);
-
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const searchAndAddUser = async () => {
-    if (!searchEmail) return;
+    if (!searchEmail || !currentUser) return;
+
     const snapshot = await get(child(ref(database), "users"));
     const usersData = snapshot.val();
     let foundUser = null;
+
     for (let uid in usersData) {
       if (usersData[uid].email === searchEmail && uid !== currentUser.uid) {
         foundUser = { uid, name: usersData[uid].username };
         break;
       }
     }
+
     if (foundUser) {
-      // Add to current user's friends
       await set(ref(database, `users/${currentUser.uid}/friends/${foundUser.uid}`), foundUser.name);
-      // Add current user to other user's friends too
       await set(ref(database, `users/${foundUser.uid}/friends/${currentUser.uid}`), usersData[currentUser.uid].username);
       setSearchEmail("");
     } else {
@@ -122,11 +153,24 @@ export default function Chat() {
     }
   };
 
+  if (!currentUser) {
+    return (
+      <div className="loading-screen">
+        <p>Authenticating user...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`}>
-      <aside className="sidebar">
-        <div className="sidebar-header">CloudChat</div>
-
+      <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+        <div className="sidebar-header">
+          <p>ZapChat</p>
+          <button onClick={toggleSidebar} className="btn toggle-btn">
+            <FaTimesCircle />
+          </button>
+        </div>
+        <hr />
         <div className="add-friend">
           <input
             type="text"
@@ -138,7 +182,21 @@ export default function Chat() {
             <FaUserPlus />
           </button>
         </div>
-
+      
+        
+        <div style={{display:"flex",justifyContent:"space-between"}}>
+        <button className="btn" onClick={() => setShowProfile(true)} style={{border:"0.5px solid black"}}>
+          <FaUserCircle /> Your Profile
+        </button>
+        <div style={{ alignItems: "center", border:"0.5px solid black"}}>
+          <button className="btn">
+         <FaCalendar /> Calander
+         </button>
+         </div>
+        </div>
+        <br />
+        <hr />
+        <br />
         <ul className="user-list">
           {friends.map((user) => (
             <li
@@ -151,11 +209,7 @@ export default function Chat() {
             </li>
           ))}
         </ul>
-
         <div className="sidebar-footer">
-           
-           <Link to="/profile">User profile</Link>
-
           <button className="btn logout-btn" onClick={handleLogout}>
             <FaSignOutAlt /> Logout
           </button>
@@ -167,7 +221,10 @@ export default function Chat() {
 
       <main className="chat-main">
         <div className="chat-header">
-          Chat with {friends.find((u) => u.id === selectedUserId)?.name || "User"}
+          {friends.find((u) => u.id === selectedUserId)?.name || "User"}
+          <button onClick={toggleSidebar} className="btn toggle-btn" style={{float:"right"}}>
+            <FaBars />
+          </button>
         </div>
 
         <div className="chat-area">
@@ -178,9 +235,7 @@ export default function Chat() {
                 msg.senderId === currentUser.uid ? "message-me" : "message-other"
               }`}
             >
-              {msg.imageUrl && (
-                <img src={msg.imageUrl} alt="upload" className="message-image" />
-              )}
+              {msg.imageUrl && <img src={msg.imageUrl} alt="upload" className="message-image" />}
               <div className="message-text">{msg.text}</div>
               <div className="message-timestamp">
                 {new Date(msg.timestamp).toLocaleTimeString([], {
@@ -225,6 +280,8 @@ export default function Chat() {
           </button>
         </div>
       </main>
+
+      {showProfile && <UserProfile onClose={() => setShowProfile(false)} />}
     </div>
   );
 }

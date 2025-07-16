@@ -4,6 +4,9 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
+//
+import { getStorage } from "firebase/storage";
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBi7VaAlAqFFUk3Ij3RMBUUAlQewkEk4RU",
@@ -23,6 +26,11 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 export { auth, database, analytics };
+
+//
+
+export const storage = getStorage(app);
+//
 export default app;
 
 /*
