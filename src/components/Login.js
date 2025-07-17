@@ -60,7 +60,8 @@ export default function Login() {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/dashboard');
+     /* navigate('/dashboard');*/
+     navigate('/Singlechat');
     } catch (error) {
       let errorMessage = 'Failed to sign in';
       

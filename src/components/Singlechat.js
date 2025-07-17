@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import  { useRef } from "react";
 import {
   FaPaperPlane,
   FaTrash,
@@ -50,6 +51,7 @@ export default function Chat() {
   const [filterDate, setFilterDate] = useState(""); // e.g., "2025-07-15"
 const [showCalendar, setShowCalendar] = useState(false);
 
+const bottomRef = useRef(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -166,32 +168,6 @@ const [showCalendar, setShowCalendar] = useState(false);
     );
   }
 
-//
-/*
-const deleteFriend = async (friendId) => {
-  if (!window.confirm("Are you sure you want to remove this friend?")) return;
-
-  try {
-    // Remove from current user's friends
-    await remove(ref(database, `users/${currentUser.uid}/friends/${friendId}`));
-
-    // Optionally: Remove from the other user's friend list as well
-    await remove(ref(database, `users/${friendId}/friends/${currentUser.uid}`));
-
-    // Clear selected user if it was the one removed
-    if (selectedUserId === friendId) {
-      setSelectedUserId(null);
-      setMessages([]);
-    }
-
-    alert("Friend removed successfully.");
-  } catch (err) {
-    console.error("Error removing friend:", err);
-  }
-};
-*/
-
-
 
 const deleteFriend = async (friendId) => {
   if (!window.confirm("Are you sure you want to remove this friend?")) return;
@@ -210,6 +186,15 @@ const deleteFriend = async (friendId) => {
     console.error("Error removing friend:", err);
   }
 };
+
+
+
+// scroll to bottom
+setTimeout(() => {
+  if (bottomRef.current) {
+    bottomRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+}, 100); // delay to ensure messages rendered
 
 
 
@@ -255,41 +240,25 @@ const deleteFriend = async (friendId) => {
   )}
 </div>
 
-
-
-        </div>
-        <br />
-        <hr />
-        <br />
-        {/*
-        <ul className="user-list">
-          {friends.map((user) => (
-            <li
-              key={user.id}
-              className={`user-item ${selectedUserId === user.id ? "active" : ""}`}
-              onClick={() => setSelectedUserId(user.id)}
-            >
-              {user.name}
-              {user.hasNewMessages && <span className="notification-badge" />}
-            </li>
-          ))}
-        </ul>
-        */}
-
-         <ul className="user-list">
-  {friends.map((user) => (
-   <li
-  key={user.id}
-  className={`user-item ${selectedUserId === user.id ? "active" : ""}`}
-  style={{
+</div>
+<br />
+<hr />
+<br />
+       
+    <ul className="user-list">
+      {friends.map((user) => (
+     <li
+      key={user.id}
+      className={`user-item ${selectedUserId === user.id ? "active" : ""}`}
+     style={{
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "10px",
     cursor: "pointer"
-  }}
-  onClick={() => setSelectedUserId(user.id)} // clicking whole li
->
+   }}
+   onClick={() => setSelectedUserId(user.id)} // clicking whole li
+  >
   <span>{user.name}</span>
 
   <button
@@ -315,7 +284,7 @@ const deleteFriend = async (friendId) => {
 
 
 
-        <div className="sidebar-footer">
+      <div className="sidebar-footer">
           <button className="btn logout-btn" onClick={handleLogout}>
             <FaSignOutAlt /> Logout
           </button>
@@ -327,7 +296,7 @@ const deleteFriend = async (friendId) => {
 
       <main className="chat-main">
         <div className="chat-header">
-          {friends.find((u) => u.id === selectedUserId)?.name || "User"}
+          {friends.find((u) => u.id === selectedUserId)?.name || "not Registed User"}
           <button onClick={toggleSidebar} className="btn toggle-btn" style={{float:"right"}}>
             <FaBars />
           </button>
@@ -335,42 +304,40 @@ const deleteFriend = async (friendId) => {
 
         <div className="chat-area">
          
-  
-
           {(() => {
-  const groupedByDate = {};
+           const groupedByDate = {};
 
-  messages
-    .filter((msg) => {
-      if (!filterDate) return true;
-      const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
-      return msgDate === filterDate;
-    })
-    .forEach((msg) => {
-      const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
-      if (!groupedByDate[msgDate]) groupedByDate[msgDate] = [];
-      groupedByDate[msgDate].push(msg);
-    });
+           messages
+           .filter((msg) => {
+            if (!filterDate) return true;
+              const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
+              return msgDate === filterDate;
+            })
+           .forEach((msg) => {
+             const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
+             if (!groupedByDate[msgDate]) groupedByDate[msgDate] = [];
+             groupedByDate[msgDate].push(msg);
+            });
 
-  return Object.entries(groupedByDate).map(([date, msgs]) => (
-    <div key={date}>
-      <div className="chat-date-header">{date}</div>
-      {msgs.map((msg) => (
-        <div
-          key={msg.id}
-          className={`message-bubble ${
-            msg.senderId === currentUser.uid ? "message-me" : "message-other"
-          }`}
-        >
-          {msg.imageUrl && (
+         return Object.entries(groupedByDate).map(([date, msgs]) => (
+         <div key={date}>
+          <div className="chat-date-header">{date}</div>
+            {msgs.map((msg) => (
+              <div
+                key={msg.id}
+                className={`message-bubble ${
+                msg.senderId === currentUser.uid ? "message-me" : "message-other"
+           }`}
+           >
+           {msg.imageUrl && (
             <img src={msg.imageUrl} alt="upload" className="message-image" />
-          )}
-          <div className="message-text">{msg.text}</div>
-          <div className="message-timestamp">
-            {new Date(msg.timestamp).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+           )}
+            <div className="message-text">{msg.text}</div>
+             <div className="message-timestamp">
+               {new Date(msg.timestamp).toLocaleTimeString([], {
+                 hour: "2-digit",
+                 minute: "2-digit",
+             })}
           </div>
           {msg.senderId === currentUser.uid && (
             <button
@@ -381,16 +348,14 @@ const deleteFriend = async (friendId) => {
               <FaTrash size={12} />
             </button>
           )}
-        </div>
-      ))}
+         </div>
+         ))}
+       </div>
+       ));
+     })()}
+
+      <div ref={bottomRef}></div>
     </div>
-  ));
-})()}
-
-
-
-
-        </div>
 
         <div className="chat-input-area">
           <input
