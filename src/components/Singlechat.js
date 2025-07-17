@@ -166,6 +166,53 @@ const [showCalendar, setShowCalendar] = useState(false);
     );
   }
 
+//
+/*
+const deleteFriend = async (friendId) => {
+  if (!window.confirm("Are you sure you want to remove this friend?")) return;
+
+  try {
+    // Remove from current user's friends
+    await remove(ref(database, `users/${currentUser.uid}/friends/${friendId}`));
+
+    // Optionally: Remove from the other user's friend list as well
+    await remove(ref(database, `users/${friendId}/friends/${currentUser.uid}`));
+
+    // Clear selected user if it was the one removed
+    if (selectedUserId === friendId) {
+      setSelectedUserId(null);
+      setMessages([]);
+    }
+
+    alert("Friend removed successfully.");
+  } catch (err) {
+    console.error("Error removing friend:", err);
+  }
+};
+*/
+
+
+
+const deleteFriend = async (friendId) => {
+  if (!window.confirm("Are you sure you want to remove this friend?")) return;
+
+  try {
+    //  Remove from current user's friend list only
+    await remove(ref(database, `users/${currentUser.uid}/friends/${friendId}`));
+
+    if (selectedUserId === friendId) {
+      setSelectedUserId(null);
+      setMessages([]);
+    }
+
+    alert("Friend removed from your list only.");
+  } catch (err) {
+    console.error("Error removing friend:", err);
+  }
+};
+
+
+
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`}>
       <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
@@ -193,17 +240,11 @@ const [showCalendar, setShowCalendar] = useState(false);
         <button className="btn" onClick={() => setShowProfile(true)} style={{border:"0.5px solid black"}}>
           <FaUserCircle /> Your Profile
         </button>
-        {/*
-        <div style={{ alignItems: "center", border:"0.5px solid black"}}>
-          <button className="btn">
-         <FaCalendar /> Calander
-         </button>
-         </div>
-         */}
-          <div style={{ alignItems: "center", border: "0.5px solid black" }}>
-  <button className="btn" onClick={() => setShowCalendar(!showCalendar)}>
-    <FaCalendar /> Calendar
-  </button>
+       
+        <div style={{ alignItems: "center", border: "0.5px solid black" }}>
+         <button className="btn" onClick={() => setShowCalendar(!showCalendar)}>
+       <FaCalendar /> Calendar
+       </button>
   {showCalendar && (
     <input
       type="date"
@@ -220,6 +261,7 @@ const [showCalendar, setShowCalendar] = useState(false);
         <br />
         <hr />
         <br />
+        {/*
         <ul className="user-list">
           {friends.map((user) => (
             <li
@@ -232,6 +274,47 @@ const [showCalendar, setShowCalendar] = useState(false);
             </li>
           ))}
         </ul>
+        */}
+
+         <ul className="user-list">
+  {friends.map((user) => (
+   <li
+  key={user.id}
+  className={`user-item ${selectedUserId === user.id ? "active" : ""}`}
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px",
+    cursor: "pointer"
+  }}
+  onClick={() => setSelectedUserId(user.id)} // clicking whole li
+>
+  <span>{user.name}</span>
+
+  <button
+    className="btn delete-friend-btn"
+    onClick={(e) => {
+      e.stopPropagation(); // Stop click bubbling to li
+      deleteFriend(user.id);
+    }}
+    title="Remove friend"
+    style={{
+      color: "red",
+      background: "none",
+      border: "none",
+      cursor: "pointer"
+    }}
+  >
+    <FaTrash />
+  </button>
+</li>
+
+  ))}
+</ul>
+
+
+
         <div className="sidebar-footer">
           <button className="btn logout-btn" onClick={handleLogout}>
             <FaSignOutAlt /> Logout
@@ -252,43 +335,7 @@ const [showCalendar, setShowCalendar] = useState(false);
 
         <div className="chat-area">
          
-   {/*}
-        {messages
-  .filter((msg) => {
-    if (!filterDate) return true;
-    const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
-    return msgDate === filterDate;
-  })
-  .map((msg) => (
-    <div
-      key={msg.id}
-      className={`message-bubble ${
-        msg.senderId === currentUser.uid ? "message-me" : "message-other"
-      }`}
-    >
-      {msg.imageUrl && (
-        <img src={msg.imageUrl} alt="upload" className="message-image" />
-      )}
-      <div className="message-text">{msg.text}</div>
-      <div className="message-timestamp">
-        {new Date(msg.timestamp).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </div>
-      {msg.senderId === currentUser.uid && (
-        <button
-          onClick={() => deleteMessage(msg.id)}
-          className="delete-button"
-          title="Delete message"
-        >
-          <FaTrash size={12} />
-        </button>
-      )}
-    </div>
-))}
-*/}
-
+  
 
           {(() => {
   const groupedByDate = {};
