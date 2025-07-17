@@ -46,6 +46,11 @@ export default function Chat() {
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
+  //
+  const [filterDate, setFilterDate] = useState(""); // e.g., "2025-07-15"
+const [showCalendar, setShowCalendar] = useState(false);
+
+
   useEffect(() => {
     if (!currentUser) return;
 
@@ -188,11 +193,29 @@ export default function Chat() {
         <button className="btn" onClick={() => setShowProfile(true)} style={{border:"0.5px solid black"}}>
           <FaUserCircle /> Your Profile
         </button>
+        {/*
         <div style={{ alignItems: "center", border:"0.5px solid black"}}>
           <button className="btn">
          <FaCalendar /> Calander
          </button>
          </div>
+         */}
+          <div style={{ alignItems: "center", border: "0.5px solid black" }}>
+  <button className="btn" onClick={() => setShowCalendar(!showCalendar)}>
+    <FaCalendar /> Calendar
+  </button>
+  {showCalendar && (
+    <input
+      type="date"
+      onChange={(e) => setFilterDate(e.target.value)}
+      value={filterDate}
+      style={{ marginTop: "5px", padding: "3px", fontSize: "14px" }}
+    />
+  )}
+</div>
+
+
+
         </div>
         <br />
         <hr />
@@ -228,6 +251,7 @@ export default function Chat() {
         </div>
 
         <div className="chat-area">
+          {/*}
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -254,6 +278,44 @@ export default function Chat() {
               )}
             </div>
           ))}
+            */}
+
+        {messages
+  .filter((msg) => {
+    if (!filterDate) return true;
+    const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
+    return msgDate === filterDate;
+  })
+  .map((msg) => (
+    <div
+      key={msg.id}
+      className={`message-bubble ${
+        msg.senderId === currentUser.uid ? "message-me" : "message-other"
+      }`}
+    >
+      {msg.imageUrl && (
+        <img src={msg.imageUrl} alt="upload" className="message-image" />
+      )}
+      <div className="message-text">{msg.text}</div>
+      <div className="message-timestamp">
+        {new Date(msg.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </div>
+      {msg.senderId === currentUser.uid && (
+        <button
+          onClick={() => deleteMessage(msg.id)}
+          className="delete-button"
+          title="Delete message"
+        >
+          <FaTrash size={12} />
+        </button>
+      )}
+    </div>
+))}
+
+
         </div>
 
         <div className="chat-input-area">
