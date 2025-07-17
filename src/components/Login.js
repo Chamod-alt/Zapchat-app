@@ -104,7 +104,7 @@ export default function Login() {
               required
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
-            }
+            
           </div>
 
           <div className="form-group">
@@ -120,11 +120,11 @@ export default function Login() {
               required
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
-            }
+            
           </div>
 
           {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
-          }
+          
 
           <button 
             type="submit" 
