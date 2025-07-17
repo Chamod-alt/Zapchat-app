@@ -251,35 +251,8 @@ const [showCalendar, setShowCalendar] = useState(false);
         </div>
 
         <div className="chat-area">
-          {/*}
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`message-bubble ${
-                msg.senderId === currentUser.uid ? "message-me" : "message-other"
-              }`}
-            >
-              {msg.imageUrl && <img src={msg.imageUrl} alt="upload" className="message-image" />}
-              <div className="message-text">{msg.text}</div>
-              <div className="message-timestamp">
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </div>
-              {msg.senderId === currentUser.uid && (
-                <button
-                  onClick={() => deleteMessage(msg.id)}
-                  className="delete-button"
-                  title="Delete message"
-                >
-                  <FaTrash size={12} />
-                </button>
-              )}
-            </div>
-          ))}
-            */}
-
+         
+   {/*}
         {messages
   .filter((msg) => {
     if (!filterDate) return true;
@@ -314,6 +287,60 @@ const [showCalendar, setShowCalendar] = useState(false);
       )}
     </div>
 ))}
+*/}
+
+
+          {(() => {
+  const groupedByDate = {};
+
+  messages
+    .filter((msg) => {
+      if (!filterDate) return true;
+      const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
+      return msgDate === filterDate;
+    })
+    .forEach((msg) => {
+      const msgDate = new Date(msg.timestamp).toISOString().split("T")[0];
+      if (!groupedByDate[msgDate]) groupedByDate[msgDate] = [];
+      groupedByDate[msgDate].push(msg);
+    });
+
+  return Object.entries(groupedByDate).map(([date, msgs]) => (
+    <div key={date}>
+      <div className="chat-date-header">{date}</div>
+      {msgs.map((msg) => (
+        <div
+          key={msg.id}
+          className={`message-bubble ${
+            msg.senderId === currentUser.uid ? "message-me" : "message-other"
+          }`}
+        >
+          {msg.imageUrl && (
+            <img src={msg.imageUrl} alt="upload" className="message-image" />
+          )}
+          <div className="message-text">{msg.text}</div>
+          <div className="message-timestamp">
+            {new Date(msg.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
+          {msg.senderId === currentUser.uid && (
+            <button
+              onClick={() => deleteMessage(msg.id)}
+              className="delete-button"
+              title="Delete message"
+            >
+              <FaTrash size={12} />
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  ));
+})()}
+
+
 
 
         </div>
