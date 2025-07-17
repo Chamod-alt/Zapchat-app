@@ -86,6 +86,18 @@ const bottomRef = useRef(null);
     });
   }, [selectedUserId, currentUser]);
 
+  //scroll botom
+
+  useEffect(() => {
+  // Only scroll when new messages come
+  setTimeout(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, 100);
+}, [messages]);
+
+
   const getConversationId = (uid1, uid2) => {
     return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
   };
@@ -190,11 +202,16 @@ const deleteFriend = async (friendId) => {
 
 
 // scroll to bottom
+{/*
 setTimeout(() => {
   if (bottomRef.current) {
     bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }
 }, 100); // delay to ensure messages rendered
+*/}
+
+
+
 
 
 
