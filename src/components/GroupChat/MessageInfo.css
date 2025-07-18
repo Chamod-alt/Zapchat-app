@@ -1,0 +1,190 @@
+.message-info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.message-info-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e1e5e9;
+  background: linear-gradient(135deg, #6a3191, #9204cf);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.message-preview {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border-left: 4px solid #6a3191;
+}
+
+.message-text {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.message-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.status-item {
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.status-header {
+  background: #f8f9fa;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.status-icon {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.double-check {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.check1 {
+  margin-right: -4px;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.check2 {
+  margin-left: -2px;
+  font-size: 0.8rem;
+}
+
+.check2.blue {
+  color: #4fc3f7;
+}
+
+.member-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-item:hover {
+  background: #f8f9fa;
+}
+
+.member-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.member-time {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Empty state */
+.member-list:empty::after {
+  content: "No members yet";
+  display: block;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .message-info-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .modal-content {
+    padding: 16px;
+  }
+  
+  .member-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .member-time {
+    align-self: flex-end;
+  }
+}
