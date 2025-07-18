@@ -48,7 +48,7 @@ export default function Chat() {
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   //filter date 
-  const [filterDate, setFilterDate] = useState(""); // e.g., "2025-07-15"
+const [filterDate, setFilterDate] = useState(""); // e.g., "2025-07-15"
 const [showCalendar, setShowCalendar] = useState(false);
 
 const bottomRef = useRef(null);
