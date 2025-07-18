@@ -60,7 +60,7 @@ export default function Login() {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/dashboard');
+      navigate('/main');
     } catch (error) {
       let errorMessage = 'Failed to sign in';
       
@@ -72,6 +72,8 @@ export default function Login() {
         errorMessage = 'Invalid email address';
       } else if (error.code === 'auth/too-many-requests') {
         errorMessage = 'Too many failed attempts. Please try again later';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your connection';
       }
       
       setErrors({ submit: errorMessage });
@@ -103,6 +105,8 @@ export default function Login() {
               required
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
+            }
+            
           </div>
 
           <div className="form-group">
@@ -118,9 +122,13 @@ export default function Login() {
               required
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
+            }
+            
           </div>
 
           {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
+          }
+          
 
           <button 
             type="submit" 
