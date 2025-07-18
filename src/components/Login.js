@@ -21,7 +21,6 @@ export default function Login() {
       [name]: value
     }));
     
-    // Clear specific error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -63,7 +62,7 @@ export default function Login() {
       navigate('/main');
     } catch (error) {
       let errorMessage = 'Failed to sign in';
-      
+
       if (error.code === 'auth/user-not-found') {
         errorMessage = 'No account found with this email';
       } else if (error.code === 'auth/wrong-password') {
@@ -75,7 +74,7 @@ export default function Login() {
       } else if (error.code === 'auth/network-request-failed') {
         errorMessage = 'Network error. Please check your connection';
       }
-      
+
       setErrors({ submit: errorMessage });
     }
 
@@ -105,8 +104,6 @@ export default function Login() {
               required
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
-            }
-            
           </div>
 
           <div className="form-group">
@@ -122,13 +119,9 @@ export default function Login() {
               required
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
-            }
-            
           </div>
 
           {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
-          }
-          
 
           <button 
             type="submit" 

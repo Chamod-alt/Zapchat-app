@@ -53,6 +53,7 @@ export default function GroupChat() {
   const [onlineUsers, setOnlineUsers] = useState({});
   const bottomRef = useRef(null);
   const messageInputRef = useRef(null);
+  const [currentUserData, setCurrentUserData] = useState(null);
 
   // Track online users
   useEffect(() => {
@@ -83,6 +84,18 @@ export default function GroupChat() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       set(userOnlineRef, false);
     };
+  }, [currentUser]);
+
+  // Load current user data
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const userRef = ref(database, `users/${currentUser.uid}`);
+    onValue(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setCurrentUserData(snapshot.val());
+      }
+    });
   }, [currentUser]);
 
   // Load user's groups
@@ -192,6 +205,46 @@ export default function GroupChat() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Check if we should show sender name (first message in sequence or after time gap)
+  const shouldShowSenderName = (message, index) => {
+    if (index === 0) return true;
+    
+    const prevMessage = messages[index - 1];
+    const timeDiff = message.timestamp - prevMessage.timestamp;
+    const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+    
+    // Show name if different sender, time gap > 5 minutes, or if replying
+    return prevMessage.senderId !== message.senderId || 
+           timeDiff > fiveMinutes || 
+           message.replyTo;
+  };
+
+  // Group consecutive messages by same sender
+  const groupMessages = (messages) => {
+    const grouped = [];
+    let currentGroup = null;
+
+    messages.forEach((message, index) => {
+      const showName = shouldShowSenderName(message, index);
+      
+      if (showName || !currentGroup || currentGroup.senderId !== message.senderId) {
+        // Start new group
+        currentGroup = {
+          senderId: message.senderId,
+          senderName: message.senderName,
+          messages: [{ ...message, showName }],
+          isCurrentUser: message.senderId === currentUser.uid
+        };
+        grouped.push(currentGroup);
+      } else {
+        // Add to current group
+        currentGroup.messages.push({ ...message, showName: false });
+      }
+    });
+
+    return grouped;
+  };
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -270,9 +323,7 @@ export default function GroupChat() {
     const message = {
       text: newMsg,
       senderId: currentUser.uid,
-      senderName: typeof currentGroup.members[currentUser.uid] === 'object' 
-        ? currentGroup.members[currentUser.uid].name || 'Unknown'
-        : currentGroup.members[currentUser.uid] || 'Unknown',
+      senderName: currentUserData?.username || currentGroup.members[currentUser.uid] || 'Unknown',
       timestamp: Date.now(),
       imageUrl: base64Image,
       mentions: mentions,
@@ -426,100 +477,109 @@ export default function GroupChat() {
             </div>
 
             <div className="group-messages-area">
-              {messages.map(message => (
-                <div key={message.id} className="group-message">
-                  {message.replyTo && (
-                    <div className="reply-context">
-                      <div className="reply-line"></div>
-                      <div className="reply-content">
-                        {(() => {
-                          const repliedMsg = getRepliedMessage(message.replyTo.id);
-                          return repliedMsg ? (
-                            <>
-                              <span className="reply-sender">{String(repliedMsg.senderName)}</span>
-                              <span className="reply-text">{repliedMsg.text}</span>
-                            </>
-                          ) : (
-                            <span className="reply-deleted">Message deleted</span>
-                          );
-                        })()}
-                      </div>
+              {groupMessages(messages).map((group, groupIndex) => (
+                <div key={`group-${groupIndex}`} className={`message-group ${group.isCurrentUser ? 'own-messages' : 'other-messages'}`}>
+                  {group.messages[0].showName && !group.isCurrentUser && (
+                    <div className="sender-name-header">
+                      <span className="sender-name">
+                        {String(group.senderName)}
+                        {isUserAdmin(group.senderId) && (
+                          <FaUserShield className="admin-badge" />
+                        )}
+                      </span>
                     </div>
                   )}
                   
-                  <div className="message-header">
-                    <span className="sender-name">
-                      {String(message.senderName)}
-                      {isUserAdmin(message.senderId) && (
-                        <FaUserShield className="admin-badge" />
+                  {group.messages.map((message, messageIndex) => (
+                    <div key={message.id} className={`message-bubble ${group.isCurrentUser ? 'own-message' : 'other-message'}`}>
+                      {message.replyTo && (
+                        <div className="reply-context">
+                          <div className="reply-line"></div>
+                          <div className="reply-content">
+                            {(() => {
+                              const repliedMsg = getRepliedMessage(message.replyTo.id);
+                              return repliedMsg ? (
+                                <>
+                                  <span className="reply-sender">{String(repliedMsg.senderName)}</span>
+                                  <span className="reply-text">{repliedMsg.text}</span>
+                                </>
+                              ) : (
+                                <span className="reply-deleted">Message deleted</span>
+                              );
+                            })()}
+                          </div>
+                        </div>
                       )}
-                    </span>
-                    <span className="message-time">
-                      {new Date(message.timestamp).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  </div>
 
-                  {message.imageUrl && (
-                    <img 
-                      src={message.imageUrl} 
-                      alt="upload" 
-                      className="group-message-image" 
-                    />
-                  )}
+                      {message.imageUrl && (
+                        <img 
+                          src={message.imageUrl} 
+                          alt="upload" 
+                          className="message-image" 
+                        />
+                      )}
 
-                  <div 
-                    className="message-content"
-                    dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
-                  />
+                      {message.text && (
+                        <div 
+                          className="message-text"
+                          dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
+                        />
+                      )}
 
-                  <div className="message-footer">
-                    {message.senderId === currentUser.uid && (
-                      <div className="message-status">
-                        {(() => {
-                          const status = getMessageStatus(message);
-                          if (!status) return null;
-                          
-                          return (
-                            <span className={`status-icon ${status.type}`}>
-                              {status.icon === 'double-check-blue' && <><FaCheck className="check1" /><FaCheck className="check2 blue" /></>}
-                              }
-                              {status.icon === 'double-check' && <><FaCheck className="check1" /><FaCheck className="check2" /></>}
-                              }
-                              {status.icon === 'single-check' && <FaCheck />}
-                            </span>
-                          );
-                        })()}
+                      <div className="message-footer">
+                        <span className="message-time">
+                          {new Date(message.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                        
+                        {message.senderId === currentUser.uid && (
+                          <div className="message-status">
+                            {(() => {
+                              const status = getMessageStatus(message);
+                              if (!status) return null;
+                              
+                              return (
+                                <span className={`status-icon ${status.type}`}>
+                                  {status.icon === 'double-check-blue' && <><FaCheck className="check1" /><FaCheck className="check2 blue" /></>}
+                                  }
+                                  {status.icon === 'double-check' && <><FaCheck className="check1" /><FaCheck className="check2" /></>}
+                                  }
+                                  {status.icon === 'single-check' && <FaCheck />}
+                                </span>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className="message-actions">
-                    <button
-                      className="action-btn"
-                      onClick={() => handleReply(message)}
-                    >
-                      <FaReply />
-                    </button>
-                    {message.senderId === currentUser.uid && (
-                      <button
-                        className="action-btn"
-                        onClick={() => handleMessageInfo(message)}
-                      >
-                        <FaInfo />
-                      </button>
-                    )}
-                    {(isUserAdmin(currentUser.uid) || message.senderId === currentUser.uid) && (
-                      <button
-                        className="action-btn delete-btn"
-                        onClick={() => deleteMessage(message.id)}
-                      >
-                        <FaTrash />
-                      </button>
-                    )}
-                  </div>
+                      <div className="message-actions">
+                        <button
+                          className="action-btn"
+                          onClick={() => handleReply(message)}
+                        >
+                          <FaReply />
+                        </button>
+                        {message.senderId === currentUser.uid && (
+                          <button
+                            className="action-btn"
+                            onClick={() => handleMessageInfo(message)}
+                          >
+                            <FaInfo />
+                          </button>
+                        )}
+                        {(isUserAdmin(currentUser.uid) || message.senderId === currentUser.uid) && (
+                          <button
+                            className="action-btn delete-btn"
+                            onClick={() => deleteMessage(message.id)}
+                          >
+                            <FaTrash />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
               <div ref={bottomRef}></div>

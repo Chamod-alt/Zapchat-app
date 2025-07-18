@@ -183,25 +183,72 @@
 .group-messages-area {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 16px 8px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 2px;
+  background: #e5ddd5;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.message-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  max-width: 75%;
 }
 
-.group-message {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 12px 16px;
+.message-group.own-messages {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message-group.other-messages {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.sender-name-header {
+  margin-bottom: 4px;
+  padding-left: 12px;
+}
+
+.sender-name-header .sender-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6a3191;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message-bubble {
+  max-width: 450px;
+  min-width: 80px;
+  width: fit-content;
+  padding: 10px 14px 30px 14px;
+  margin-bottom: 2px;
   position: relative;
-  transition: all 0.2s ease;
+  word-wrap: break-word;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
-.group-message:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.message-bubble.own-message {
+  background: #dcf8c6;
+  border-bottom-right-radius: 2px;
+  margin-left: auto;
+  margin-right: 8px;
 }
 
-.group-message:hover .message-actions {
+.message-bubble.other-message {
+  background: white;
+  border-bottom-left-radius: 2px;
+  margin-left: 8px;
+  margin-right: auto;
+}
+
+.message-bubble:hover .message-actions {
   opacity: 1;
 }
 
@@ -234,49 +281,39 @@
   color: #666;
 }
 
-.reply-deleted {
-  color: #999;
-  font-style: italic;
-}
-
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.sender-name {
-  font-weight: 600;
-  color: #6a3191;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 .admin-badge {
   color: #ffd700;
   font-size: 0.8rem;
 }
 
-.message-time {
-  font-size: 0.8rem;
-  color: #666;
+.reply-deleted {
+  color: #999;
+  font-style: italic;
 }
 
-.group-message-image {
-  max-width: 300px;
+.message-image {
+  max-width: 350px;
+  min-width: 150px;
+  width: 100%;
   border-radius: 8px;
-  margin: 8px 0;
+  margin-bottom: 4px;
+  display: block;
+  height: auto;
 }
 
-.message-content {
+.message-text {
   line-height: 1.4;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 1.4em;
+  display: block;
+  width: 100%;
 }
 
-.message-content .mention {
+.message-text .mention {
   background: #e3f2fd;
   color: #6a3191;
   padding: 2px 6px;
@@ -286,12 +323,23 @@
 
 .message-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   margin-top: 4px;
+  gap: 8px;
+  position: absolute;
+  bottom: 6px;
+  left: 14px;
+  right: 60px;
+}
+
+.message-time {
+  font-size: 0.7rem;
+  color: #666;
 }
 
 .message-status {
+  margin-left: 4px;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -300,7 +348,7 @@
 .status-icon {
   display: flex;
   align-items: center;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: #999;
   position: relative;
 }
@@ -316,21 +364,25 @@
 .status-icon .check2 {
   margin-left: -2px;
 }
+
 .message-actions {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  bottom: 4px;
+  right: 4px;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   opacity: 0;
   transition: opacity 0.2s ease;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 2px;
 }
 
 .action-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ddd;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 0.8rem;
   transition: all 0.2s ease;
@@ -344,6 +396,11 @@
 .delete-btn:hover {
   color: #e53935;
   border-color: #e53935;
+}
+
+.own-message .message-actions {
+  right: 8px;
+  bottom: 4px;
 }
 
 .group-input-area {
@@ -474,6 +531,29 @@
     position: relative;
   }
   
+  .message-group {
+    max-width: 85%;
+  }
+  
+  .message-bubble {
+    max-width: 90%;
+  }
+  
+  .message-bubble.own-message {
+    margin-left: auto;
+    margin-right: 4px;
+  }
+  
+  .message-bubble.other-message {
+    margin-left: 4px;
+    margin-right: auto;
+  }
+  
+  .message-image {
+    max-width: 280px;
+    min-width: 120px;
+  }
+  
   .group-sidebar {
     position: fixed;
     top: 0;
@@ -504,5 +584,44 @@
 @media (min-width: 769px) {
   .mobile-toggle {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .group-messages-area {
+    padding: 12px 4px;
+  }
+  
+  .message-group {
+    max-width: 95%;
+  }
+  
+  .message-bubble {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    max-width: 95%;
+  }
+  
+  .message-bubble.own-message {
+    margin-left: auto;
+    margin-right: 2px;
+  }
+  
+  .message-bubble.other-message {
+    margin-left: 2px;
+    margin-right: auto;
+  }
+  
+  .message-image {
+    max-width: 250px;
+    min-width: 100px;
+  }
+  
+  .message-time {
+    font-size: 0.65rem;
+  }
+  
+  .sender-name-header .sender-name {
+    font-size: 0.75rem;
   }
 }

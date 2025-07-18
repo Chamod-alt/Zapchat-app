@@ -7,9 +7,8 @@ import {
   FaUserCircle, 
   FaSignOutAlt, 
   FaBars, 
-  FaTimes,
-  FaMoon,
-  FaSun
+  FaTimes
+  // FaMoon, FaSun - Dark mode icons removed
 } from 'react-icons/fa';
 import Singlechat from './Singlechat';
 import GroupChat from './GroupChat/GroupChat';
@@ -22,7 +21,8 @@ export default function MainDashboard() {
   const [activeTab, setActiveTab] = useState('single');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  // Dark mode functionality disabled
+  // const [darkMode, setDarkMode] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -37,9 +37,10 @@ export default function MainDashboard() {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  // Dark mode toggle function disabled
+  // const toggleDarkMode = () => {
+  //   setDarkMode(!darkMode);
+  // };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -55,7 +56,7 @@ export default function MainDashboard() {
   };
 
   return (
-    <div className={`main-dashboard ${darkMode ? 'dark' : ''}`}>
+    <div className="main-dashboard">
       <aside className={`main-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <h2>ZapChats</h2>
@@ -71,7 +72,6 @@ export default function MainDashboard() {
           >
             <FaComments />
             {!sidebarCollapsed && <span>Single Chat</span>}
-            }
           </button>
           
           <button 
@@ -80,7 +80,6 @@ export default function MainDashboard() {
           >
             <FaUsers />
             {!sidebarCollapsed && <span>Group Chat</span>}
-            }
           </button>
           
           <button 
@@ -89,21 +88,21 @@ export default function MainDashboard() {
           >
             <FaUserCircle />
             {!sidebarCollapsed && <span>Profile</span>}
-            }
           </button>
         </nav>
 
         <div className="sidebar-footer">
+          {/* Dark mode toggle disabled */}
+          {/* 
           <button onClick={toggleDarkMode} className="footer-btn">
             {darkMode ? <FaSun /> : <FaMoon />}
             {!sidebarCollapsed && <span>{darkMode ? 'Light' : 'Dark'}</span>}
-            }
           </button>
+          */}
           
           <button onClick={handleLogout} className="footer-btn logout">
             <FaSignOutAlt />
             {!sidebarCollapsed && <span>Logout</span>}
-            }
           </button>
         </div>
       </aside>
