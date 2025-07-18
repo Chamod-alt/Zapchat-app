@@ -47,12 +47,12 @@ export default function Chat() {
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
-  //
+  //filter date 
   const [filterDate, setFilterDate] = useState(""); // e.g., "2025-07-15"
 const [showCalendar, setShowCalendar] = useState(false);
 
 const bottomRef = useRef(null);
-
+//load of friend list
   useEffect(() => {
     if (!currentUser) return;
 
@@ -70,12 +70,12 @@ const bottomRef = useRef(null);
       }
     });
   }, [currentUser]);
-
+//load messages under the select user
   useEffect(() => {
     if (!selectedUserId || !currentUser) return;
 
     const convoId = getConversationId(currentUser.uid, selectedUserId);
-    const messagesRef = ref(database, `conversations/${convoId}/messages`);
+    const messagesRef = ref(database, `conversations/${convoId}/messages`);//conversations parth
     onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();
       const loaded = [];
@@ -101,7 +101,7 @@ const bottomRef = useRef(null);
   const getConversationId = (uid1, uid2) => {
     return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
   };
-
+//convertiong images base64
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -110,13 +110,13 @@ const bottomRef = useRef(null);
       reader.readAsDataURL(file);
     });
   };
-
+//send message function
   const sendMessage = async () => {
     if (!newMsg && !image) return;
 
     const convoId = getConversationId(currentUser.uid, selectedUserId);
     const newMessageRef = push(ref(database, `conversations/${convoId}/messages`));
-
+ 
     let base64Image = null;
     if (image) {
       base64Image = await convertToBase64(image);
@@ -134,12 +134,12 @@ const bottomRef = useRef(null);
     setNewMsg("");
     setImage(null);
   };
-
+//delete message function
   const deleteMessage = async (msgId) => {
     const convoId = getConversationId(currentUser.uid, selectedUserId);
     await remove(ref(database, `conversations/${convoId}/messages/${msgId}`));
   };
-
+//logout function
   const handleLogout = async () => {
     try {
       await logout();
@@ -148,7 +148,7 @@ const bottomRef = useRef(null);
       console.error("Logout error:", error);
     }
   };
-
+// search and add user by email
   const searchAndAddUser = async () => {
     if (!searchEmail || !currentUser) return;
 
@@ -180,7 +180,7 @@ const bottomRef = useRef(null);
     );
   }
 
-
+// delete user in user list
 const deleteFriend = async (friendId) => {
   if (!window.confirm("Are you sure you want to remove this friend?")) return;
 
@@ -198,21 +198,6 @@ const deleteFriend = async (friendId) => {
     console.error("Error removing friend:", err);
   }
 };
-
-
-
-// scroll to bottom
-{/*
-setTimeout(() => {
-  if (bottomRef.current) {
-    bottomRef.current.scrollIntoView({ behavior: "smooth" });
-  }
-}, 100); // delay to ensure messages rendered
-*/}
-
-
-
-
 
 
   return (
@@ -318,7 +303,7 @@ setTimeout(() => {
             <FaBars />
           </button>
         </div>
-
+        {/*chat body*/}
         <div className="chat-area">
          
           {(() => {
@@ -382,6 +367,7 @@ setTimeout(() => {
             className="file-input"
             id="imgUpload"
           />
+          {/*send message part*/ }
           <label htmlFor="imgUpload" className="image-upload-label" title="Upload Image">
             <FaImage size={20} />
           </label>
