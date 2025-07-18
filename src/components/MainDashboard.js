@@ -71,7 +71,6 @@ export default function MainDashboard() {
           >
             <FaComments />
             {!sidebarCollapsed && <span>Single Chat</span>}
-            }
           </button>
           
           <button 
@@ -80,7 +79,6 @@ export default function MainDashboard() {
           >
             <FaUsers />
             {!sidebarCollapsed && <span>Group Chat</span>}
-            }
           </button>
           
           <button 
@@ -89,7 +87,6 @@ export default function MainDashboard() {
           >
             <FaUserCircle />
             {!sidebarCollapsed && <span>Profile</span>}
-            }
           </button>
         </nav>
 
@@ -97,13 +94,11 @@ export default function MainDashboard() {
           <button onClick={toggleDarkMode} className="footer-btn">
             {darkMode ? <FaSun /> : <FaMoon />}
             {!sidebarCollapsed && <span>{darkMode ? 'Light' : 'Dark'}</span>}
-            }
           </button>
           
           <button onClick={handleLogout} className="footer-btn logout">
             <FaSignOutAlt />
             {!sidebarCollapsed && <span>Logout</span>}
-            }
           </button>
         </div>
       </aside>
