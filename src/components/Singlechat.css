@@ -440,6 +440,14 @@
 }
 
 
+@media (max-width: 350px) {
+  .chat-input-area {
+    padding:12px 2px;
+    gap: 4px;
+  }
+}
+
+
 
 .chat-date-header {
   font-weight: bold;
